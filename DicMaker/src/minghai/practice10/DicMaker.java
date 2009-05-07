@@ -56,61 +56,37 @@ public class DicMaker extends Activity {
         }
 
         // insert people with their respective occupation
-        System.out.println();
+
         FileReader fr = null;
         BufferedReader br = null;
-        try {
-                fr = new FileReader("/sdcard/skki1_0u.dic.utf8");
-                br = new BufferedReader(fr);
 
-                int c = 0;
-                ContentValues cv = new ContentValues();
-                Log.d("TEST", "ファイル入力開始");
-                for (String line = br.readLine(); line != null; line = br.readLine()) {
-                  
-                }
+        fr = new FileReader("/sdcard/skk_L_dic_for_android_sorted.utf8");
+        br = new BufferedReader(fr);
+
+        int c = 0;
+
+        Log.d("TEST", "ファイル入力開始");
+        for (String line = br.readLine(); line != null; line = br.readLine()) {
+          if (line.startsWith(";;")) continue;
+
+          int idx = line.indexOf(' ');
+          if (idx == -1) continue;
+          String key = line.substring(0, idx);
+          String value = line.substring(idx + 1, line.length());
+
+          tree.insert( key, value, true );
+
+          if (++c % 1000 == 0) {
+            recman.commit();
+            Log.d("TEST", "commited: " + c);
+          }
+        }
 
         // make the data persistent in the database
         recman.commit();
 
-        // show list of people with their occupation
-        System.out.println();
-        System.out.println( "Person                   Occupation       " );
-        System.out.println( "------------------       ------------------" );
-
-        // traverse people in order
-        browser = tree.browse();
-        while ( browser.getNext( tuple ) ) {
-            print( tuple );
-        }
-
-        // traverse people in reverse order
-        System.out.println();
-        System.out.println( "Reverse order:" );
-        browser = tree.browse( null ); // position browser at end of the list
-
-        while ( browser.getPrevious( tuple ) ) {
-            print( tuple );
-        }
-
-
-
-        // display people whose name start with PREFIX range
-        System.out.println();
-        System.out.println( "All people whose name start with '" + PREFIX + "':" );
-
-        browser = tree.browse( PREFIX );
-        while ( browser.getNext( tuple ) ) {
-            String key = (String) tuple.getKey();
-            if ( key.startsWith( PREFIX ) ) {
-                print( tuple );
-            } else {
-                break;
-            }
-        }
-
-    } catch ( Exception except ) {
-        except.printStackTrace();
+    } catch ( Exception e ) {
+       throw new RuntimeException(e);
     }
   }
 }
