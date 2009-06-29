@@ -31,6 +31,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +52,7 @@ public class HomeHarukaWidget extends AppWidgetProvider {
     h.put("さっすが、私のプロデューサーさんです♪", 8);
     h.put("頼りにしてますよ、\nプロデューサーさん！", 11);
     h.put("プロデューサーさん、\n今日もキマってますね！", 6);
-    h.put("いつもありがとうございます、\nプロデューサーさん♪", 5);
+    h.put("いつも\nありがとうございます、\nプロデューサーさん♪", 5);
     h.put("プロデューサーさん、\nこれからもずっと私と居てください！", 13);
     h.put("プロデューサーさんって、ひょっとして天才？", 12);
     h.put("すごーい！\nプロデューサーさん、\n尊敬しちゃいます♪", 9);
@@ -62,7 +63,7 @@ public class HomeHarukaWidget extends AppWidgetProvider {
     h.put("プロデューサーさんって\nすっごく頭がいいんですね♪", 8);
     h.put("プロデューサーさんのおかげで、ほんと助かってます！", 6);
     h.put("プロデューサー君、\nスーシーでもいく？", 7);
-    h.put("もー！プロデューサーさん、\nしっかりしてください！", 3);
+    h.put("もー！\nプロデューサーさん、\nしっかりしてください！", 3);
     h.put("たるんでるんじゃないですか、プロデューサーさん？", 10);
     h.put("だ、大丈夫ですか！\nプロデューサーさん！", 13);
     h.put("え？な、なんのことですか、プロデューサーさん？", 7);
@@ -87,7 +88,8 @@ public class HomeHarukaWidget extends AppWidgetProvider {
     h.put("あの、プロデューサーさん！\n私としたこと、\n覚えてます…？", 5);
   }
 
-
+  static private Random rand = new Random(System.currentTimeMillis());
+  
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
             int[] appWidgetIds) {
@@ -113,7 +115,7 @@ public class HomeHarukaWidget extends AppWidgetProvider {
          */
         public RemoteViews buildUpdate(Context context) {
           Object[] keys = (lines.keySet().toArray());
-          String message = (String)keys[(int)(System.currentTimeMillis() % keys.length)];
+          String message = (String)keys[rand.nextInt(keys.length)];
           int i = lines.get(message);
           int resID = getResources().getIdentifier("h" + i, "drawable", "minghai.homeharuka");
           RemoteViews updateViews = null;
