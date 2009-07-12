@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package minghai.homeharuka;
+package minghai.nisesakura;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -25,11 +25,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.text.format.Time;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import java.nio.MappedByteBuffer;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -39,7 +41,7 @@ import java.util.regex.Pattern;
  * Define a simple widget that shows the Wiktionary "Word of the day." To build
  * an update we spawn a background {@link Service} to perform the API queries.
  */
-public class HomeHarukaWidget extends AppWidgetProvider {
+public class NiseSakuraWidget extends AppWidgetProvider {
   static public HashMap<String, Integer> lines = new HashMap<String, Integer>();
   
   {
@@ -94,20 +96,29 @@ public class HomeHarukaWidget extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
             int[] appWidgetIds) {
       for (int i : appWidgetIds) {
+        String sakura_message = NiseSakuraWidgetConfigure.loadSakuraMessage(context, i);
+        String unyuu_message  = NiseSakuraWidgetConfigure.loadUnyuuMessage(context, i);
+        
+        // Construct the RemoteViews object.  It takes the package name (in our case, it's our
+        // package, but it needs this because on the other side it's the widget host inflating
+        // the layout from our package).
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_message);
+        views.setTextViewText(R.id.sakura_message, sakura_message);
+        views.setTextViewText(R.id.unyuu_message,  unyuu_message);
+        
+        // Create an Intent to launch ExampleActivity
+        Intent intent = new Intent(context, NiseSakuraWidgetConfigure.class);
+        Bundle b = new Bundle();
+        b.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, i);
+        //intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, i);
+        intent.putExtras(b);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-        Object[] keys = (lines.keySet().toArray());
-        String message = (String)keys[rand.nextInt(keys.length)];
-        int j = lines.get(message);
-        int resID = context.getResources().getIdentifier("h" + j, "drawable", "minghai.homeharuka");
-        //int resID = context.getResources().getIdentifier("c1", "drawable", "minghai.homeharuka");
-
-        // Didn't find word of day, so show error message
-        RemoteViews updateViews = new RemoteViews(context.getPackageName(), R.layout.widget_message);
-        updateViews.setTextViewText(R.id.message, message);
-        updateViews.setImageViewResource(R.id.haruka, resID);
+        // Get the layout for the App Widget and attach an on-click listener to the button
+        views.setOnClickPendingIntent(R.id.unyuu, pendingIntent);
 
         // Tell the widget manager
-        appWidgetManager.updateAppWidget(i, updateViews);
+        appWidgetManager.updateAppWidget(i, views);
       }
     }
 }
