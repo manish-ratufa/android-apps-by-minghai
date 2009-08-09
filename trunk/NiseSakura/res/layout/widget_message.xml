@@ -22,46 +22,25 @@
     <FrameLayout
       android:layout_width="fill_parent" 
       android:layout_height="wrap_content"
+      android:visibility="invisible"
       android:id="@+id/baloon0">
       <ImageView
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content"
-        android:src="@drawable/balloonk0" />
+        android:src="@drawable/balloons0" />
       <TextView  
         android:id="@+id/sakura_message"
         android:layout_width="fill_parent" 
         android:layout_height="wrap_content"
+        android:maxWidth="378px"
+        android:maxHeight="178px"
+        android:scrollbars="vertical"
         android:layout_marginTop="1dip"
         android:padding="10dip"
-
         android:gravity="left"
         android:layout_gravity="center"
-        android:text="総帥は逝って良し！"
-
-        style="@style/Text.Loading" />
-    </FrameLayout>
-    
-    <FrameLayout
-      android:layout_width="fill_parent" 
-      android:layout_height="wrap_content"
-      android:layout_below="@id/baloon0"
-      android:id="@+id/baloon1">    
-      <ImageView
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content"
-
-        android:src="@drawable/balloonk1" />
-        
-      <TextView  
-        android:id="@+id/unyuu_message"
-        android:layout_width="fill_parent" 
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dip"
-        android:padding="15dip"
-
-        android:gravity="left"
-        android:layout_gravity="center"
-        android:text="逝って良し！"
+        android:autoLink="web|map"
+        android:linksClickable="true"
 
         style="@style/Text.Loading" />
     </FrameLayout>
@@ -71,12 +50,10 @@
         android:layout_width="wrap_content" 
         android:layout_height="wrap_content"
 
-        android:layout_below="@id/baloon1"
-
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
 
-        android:src="@drawable/surface7" />
+        android:src="@drawable/surface0" />
 
     <ImageView
         android:id="@+id/unyuu"
@@ -86,6 +63,38 @@
         android:layout_toLeftOf="@id/sakura"
 
         android:src="@drawable/surface10" />
+            
+    <FrameLayout
+      android:layout_width="wrap_content" 
+      android:layout_height="wrap_content"
+      android:layout_toLeftOf="@id/sakura"
+      android:layout_above="@id/unyuu"
+      android:visibility="invisible"
+      android:id="@+id/baloon1">    
+      <ImageView
+        android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"
 
+        android:src="@drawable/balloons1" />
+        
+      <TextView  
+        android:id="@+id/unyuu_message"
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent"
+        android:maxWidth="168px"
+        android:maxHeight="136px"
+        android:scrollbars="vertical"
+        android:layout_marginTop="1dip"
+        android:paddingTop="5px"
+        android:paddingLeft="5px"
+        android:paddingRight="5px"
+        android:paddingBottom="10px"
+
+        android:gravity="left|top|fill"
+        android:autoLink="web|map"
+        android:linksClickable="true"
+
+        style="@style/Text.Loading" />
+    </FrameLayout>
 
 </RelativeLayout>

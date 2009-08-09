@@ -35,7 +35,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="ここに入力した言葉を偽うにゅうが喋ります"
+        android:text="ここに入力した言葉をうにゅうが喋ります"
     />
 
     <EditText

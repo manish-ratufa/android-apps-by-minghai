@@ -15,13 +15,13 @@
 -->
 
 <resources>
-    <string name="app_name">偽・偽春菜</string>
+    <string name="app_name">偽さくら</string>
 
     <string name="template_user_agent">"%s/%s (Linux; Android)"</string>
     <string name="template_wotd_title">"Wiktionary:Word of the day/%s %s"</string>
     <string name="template_define_url">"http://en.wiktionary.org/wiki/%s"</string>
     
-    <string name="widget_name">偽・偽春菜</string>
+    <string name="widget_name">偽さくら</string>
 
     <string name="widget_loading">ロード中…</string>
     <string name="widget_error">ぐんにょり</string>
