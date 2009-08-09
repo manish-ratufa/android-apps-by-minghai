@@ -17,7 +17,21 @@
             <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
           </intent-filter>
         </activity>
+        
+        <!-- Service to perform web API queries -->        
+        <service
+          android:name=".NiseSakuraWidgetUpdateService"
+          android:exported="true">
+          <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <action android:name="android.intent.action.INSERT" />
+            <action android:name="android.intent.action.MEDIA_BUTTON" />
+            <data android:mimeType="text/sakura_script" />
+          </intent-filter>
+        </service>
+
     </application>
     
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-sdk android:minSdkVersion="3" />
 </manifest> 

@@ -38,87 +38,43 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Define a simple widget that shows the Wiktionary "Word of the day." To build
- * an update we spawn a background {@link Service} to perform the API queries.
+ * さくらとうにゅうを表示します。起動は1個だけにしてね！
+ * 
  */
 public class NiseSakuraWidget extends AppWidgetProvider {
-  static public HashMap<String, Integer> lines = new HashMap<String, Integer>();
+  // onUpdateは最初の1回しか呼ばれない、はず。
+  @Override
+  public void onUpdate(Context context, AppWidgetManager appWidgetManager,
+          int[] appWidgetIds) {
+    context.startService(new Intent(context, NiseSakuraWidgetUpdateService.class));
+  }
   
-  {
-    HashMap<String, Integer> h = lines;
-    h.put("プロデューサーさん、\n好きです！", 1);
-    h.put("プロデューサーさん、\n大好きです！", 13);
-    h.put("プロデューサーさん、\nかっこいい！", 5);
-    h.put("おつかれさまです、\nプロデューサーさん♪", 6);
-    h.put("プロデューサーさんじゃなきゃダメなんです！", 1);
-    h.put("さっすが、私のプロデューサーさんです♪", 8);
-    h.put("頼りにしてますよ、\nプロデューサーさん！", 11);
-    h.put("プロデューサーさん、\n今日もキマってますね！", 6);
-    h.put("いつも\nありがとうございます、\nプロデューサーさん♪", 5);
-    h.put("プロデューサーさん、\nこれからもずっと私と居てください！", 13);
-    h.put("プロデューサーさんって、ひょっとして天才？", 12);
-    h.put("すごーい！\nプロデューサーさん、\n尊敬しちゃいます♪", 9);
-    h.put("プロデューサーさん、\n素敵です♪", 5);
-    h.put("一緒に頑張りましょう、\nプロデューサーさん！", 8);
-    h.put("プロデューサーさんって、\nおしゃれですよねー", 4);
-    h.put("プロデューサーさん、\nすごいです！", 5);
-    h.put("プロデューサーさんって\nすっごく頭がいいんですね♪", 8);
-    h.put("プロデューサーさんのおかげで、ほんと助かってます！", 6);
-    h.put("プロデューサー君、\nスーシーでもいく？", 7);
-    h.put("もー！\nプロデューサーさん、\nしっかりしてください！", 3);
-    h.put("たるんでるんじゃないですか、プロデューサーさん？", 10);
-    h.put("だ、大丈夫ですか！\nプロデューサーさん！", 13);
-    h.put("え？な、なんのことですか、プロデューサーさん？", 7);
-    h.put("ご、ごめんなさい、\nプロデューサーさん…", 2);
-    h.put("え？それってどういうことですか、\nプロデューサーさん？", 12);
-    h.put("プロデューサーさん、私…", 1);
-    h.put("プロデューサーさん…\nえへへ、何でもないです♪", 4);
-    h.put("ふざけないでください、\nプロデューサーさん！", 3);
-    h.put("わっ！お、脅かさないでくださいよ、\nプロデューサーさん…", 2);
-    h.put("やりましたね、\nプロデューサーさん！", 5);
-    h.put("頑張り過ぎないでくださいね、プロデューサーさん", 8);
-    h.put("プロデューサーさん、\n無理しないでくださいね", 9);
-    h.put("プロデューサーさん…", 1);
-    h.put("や、やめてください、\nプロデューサーさん！", 2);
-    h.put("ちゃんと聞いてください、\nプロデューサーさん！", 3);
-    h.put("もー、仕方ないですね、\nプロデューサーさん", 1);
-    h.put("プロデューサーさん、どうしましょう？", 12);
-    h.put("楽しみですね、\nプロデューサーさん♪", 6);
-    h.put("元気出してください、\nプロデューサーさん", 11);
-    h.put("は、恥ずかしいから\nやめてください、\nプロデューサーさん…", 13);
-    h.put("応援してます、\nプロデューサーさん♪", 8);
-    h.put("あの、プロデューサーさん！\n私としたこと、\n覚えてます…？", 5);
+  // onDeletedは呼ばれない場合があるバグがあるので利用しません
+  @Override
+  public void onDeleted(Context context, int[] appWidgetIds) {
+    Log.d("TEST", "NiseSakura.onDeleted()");
+    super.onDeleted(context, appWidgetIds);
   }
 
-  static private Random rand = new Random(System.currentTimeMillis());
-  
-    @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager,
-            int[] appWidgetIds) {
-      for (int i : appWidgetIds) {
-        String sakura_message = NiseSakuraWidgetConfigure.loadSakuraMessage(context, i);
-        String unyuu_message  = NiseSakuraWidgetConfigure.loadUnyuuMessage(context, i);
-        
-        // Construct the RemoteViews object.  It takes the package name (in our case, it's our
-        // package, but it needs this because on the other side it's the widget host inflating
-        // the layout from our package).
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_message);
-        views.setTextViewText(R.id.sakura_message, sakura_message);
-        views.setTextViewText(R.id.unyuu_message,  unyuu_message);
-        
-        // Create an Intent to launch ExampleActivity
-        Intent intent = new Intent(context, NiseSakuraWidgetConfigure.class);
-        Bundle b = new Bundle();
-        b.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, i);
-        //intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, i);
-        intent.putExtras(b);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+  @Override
+  public void onDisabled(Context context) {
+    Log.d("TEST", "NiseSakura.onDisabled()");
+    super.onDisabled(context);
+  }
 
-        // Get the layout for the App Widget and attach an on-click listener to the button
-        views.setOnClickPendingIntent(R.id.unyuu, pendingIntent);
+  @Override
+  public void onEnabled(Context context) {
+    Log.d("TEST", "NiseSakura.onEnabled()");
+    super.onEnabled(context);
+  }
 
-        // Tell the widget manager
-        appWidgetManager.updateAppWidget(i, views);
-      }
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    Log.d("TEST", "NiseSakura.onReceive(): " + intent);
+    super.onReceive(context, intent);
+    // さくらがホーム画面から捨てられたらサービスも止める。複数起動を許可したらたぶん修正が必要。
+    if (AppWidgetManager.ACTION_APPWIDGET_DELETED.equals(intent.getAction())) {
+      context.stopService(new Intent(context, NiseSakuraWidgetUpdateService.class));
     }
+  }
 }
