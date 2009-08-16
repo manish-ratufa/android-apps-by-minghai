@@ -111,7 +111,7 @@ public class NiseSakuraWidgetUpdater {
     }
   }
   
-  private ConcurrentLinkedQueue<String> mMessages = new ConcurrentLinkedQueue<String>();
+  static final private ConcurrentLinkedQueue<String> mMessages = new ConcurrentLinkedQueue<String>();
   
   public synchronized void addMessages(String[] messages) {
     for (String s : messages) {

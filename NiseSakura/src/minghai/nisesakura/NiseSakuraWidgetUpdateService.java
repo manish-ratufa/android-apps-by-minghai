@@ -45,6 +45,7 @@ import android.os.Message;
 import android.util.Log;
 
 public class NiseSakuraWidgetUpdateService extends Service {
+  private NiseSakuraWidgetUpdater mUpdater;
 
   @Override
   public void onCreate() {
@@ -57,11 +58,13 @@ public class NiseSakuraWidgetUpdateService extends Service {
   public void onStart(Intent intent, int startId) {
     super.onStart(intent, startId);
     String msg = intent.getStringExtra("message"); 
-    NiseSakuraWidgetUpdater updater = NiseSakuraWidgetUpdater.getInstance();
     
-    updater.setContext(this);
+    Log.d("TEST", "onStart: this = " + this);
+    
+    mUpdater = NiseSakuraWidgetUpdater.getInstance();
+    mUpdater.setContext(this);
 
-    if (msg != null) updater.addMessage(msg);
+    if (msg != null) mUpdater.addMessage(msg);
     
     String action = intent.getAction();
     if (action == null) {
@@ -69,30 +72,30 @@ public class NiseSakuraWidgetUpdateService extends Service {
       int i = loadExecutionCount(this);
       Log.d("TEST", "onStart: i = " + i);
       if (i == Integer.MIN_VALUE) {
-        openingEvent(updater);
-        updater.play();
+        openingEvent();
+        mUpdater.play();
         saveExecutionCount(this, 1);
       } else {
         saveExecutionCount(this, ++i);
-        updater.updateLeftMessagesSize();
+        mUpdater.updateLeftMessagesSize();
       }
     } else if (Intent.ACTION_INSERT.equals(action)) {
       // Nothing to do
     } else if (Intent.ACTION_VIEW.equals(action)) {
-      updater.play();
+      mUpdater.play();
     } else if (Intent.ACTION_MEDIA_BUTTON.equals(action)) {
-      updater.playOrPause();
+      mUpdater.playOrPause();
     }
   }
 
-  private void openingEvent(NiseSakuraWidgetUpdater updater) {
+  private void openingEvent() {
     try {
       BufferedReader br = new BufferedReader(
           new InputStreamReader(getResources().openRawResource(R.raw.event_opening_talk), "UTF-8"));
 
       for (String line = br.readLine(); line != null; line = br.readLine()) {
         if (line.equals("") || line.startsWith("#")) continue;
-        updater.addMessage(line);
+        mUpdater.addMessage(line);
       }
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
@@ -114,6 +117,7 @@ public class NiseSakuraWidgetUpdateService extends Service {
     super.onDestroy();
     NiseSakuraWidgetUpdater updater = NiseSakuraWidgetUpdater.getInstance();
     updater.forceStop();
+    Log.d("TEST", "onDestory: called");
     
     mHandler.removeMessages(HTTP_TASK_START);
   }
@@ -150,11 +154,12 @@ public class NiseSakuraWidgetUpdateService extends Service {
   };
   
   private class TwitterTask extends AsyncTask<Context, String, String> {
-    private NiseSakuraWidgetUpdater mUpdater;
 
     @Override
     protected void onPreExecute() {
+      // You can't call this in the background thread
       mUpdater = NiseSakuraWidgetUpdater.getInstance();
+      mUpdater.setContext(NiseSakuraWidgetUpdateService.this);
     }
 
     @Override
@@ -200,5 +205,10 @@ public class NiseSakuraWidgetUpdateService extends Service {
       //mEditText.append(result);
     }
 
+  }
+
+  @Override
+  public void onLowMemory() {
+    Log.d("TEST", "Service.onLowMemory: ");
   }
 }
