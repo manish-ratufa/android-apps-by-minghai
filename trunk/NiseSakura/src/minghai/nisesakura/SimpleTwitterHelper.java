@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -49,6 +50,22 @@ import junit.framework.Test;
  */
 public class SimpleTwitterHelper {
     private static final String TAG = "NiseSakuraTwitterHelper";
+    private   static final String REFRESH_URL_KEY = "refresh_url";
+    
+    // Write the prefix to the SharedPreferences object for this widget
+    static void saveRefreshURL(Context context, String refreshURL) {
+      SharedPreferences.Editor prefs = context.getSharedPreferences(NiseSakuraWidgetUpdateService.PREFS_NAME, 0).edit();
+      prefs.putString(REFRESH_URL_KEY, refreshURL);
+      prefs.commit();
+    }
+
+    // Read the prefix from the SharedPreferences object for this widget.
+    // If there is no preference saved, get the default from a resource
+    static String loadRefreshURL(Context context) {
+      SharedPreferences prefs = context.getSharedPreferences(NiseSakuraWidgetUpdateService.PREFS_NAME, 0);
+      String refreshURL = prefs.getString(REFRESH_URL_KEY, QUERY_OPTION);
+      return refreshURL;
+    }
     
     /**
      * Partial URL to use when requesting the detailed entry for a specific
@@ -123,6 +140,7 @@ public class SimpleTwitterHelper {
      * lightweight API call, and trims out just the page content returned.
      * Because this call blocks until results are available, it should not be
      * run from a UI thread.
+     * @param context 
      * 
      * @param title The exact title of the Wiktionary page requested.
      * @param expandTemplates If true, expand any wiki templates found.
@@ -130,10 +148,13 @@ public class SimpleTwitterHelper {
      * @throws ApiException If any connection or server error occurs.
      * @throws ParseException If there are problems parsing the response.
      */
-    public static LinkedList<String> getPageContent()
+    public static LinkedList<String> getPageContent(Context context)
             throws ApiException, ParseException {
         // Encode page title and expand templates if requested
         //String encodedTitle = Uri.encode(title);
+        
+        QUERY_OPTION = loadRefreshURL(context);
+        Log.d(TAG, "QUERY_OPTION = " + QUERY_OPTION);
         
         // Query the API for content
         String content = getUrlContent(TWITTER_SEARCH + QUERY_OPTION);
@@ -150,14 +171,13 @@ public class SimpleTwitterHelper {
             JSONObject one = result.getJSONObject(i);
             String text = one.getString("text");
             
-            Log.d(TAG, "rurl(" + i + ") = " + text);
-            
             if (text.startsWith(prefix)) { 
               text = text.substring(prefix.length(), text.length());
               results.addFirst(text);
             }
           }
           QUERY_OPTION = all.getString("refresh_url");
+          saveRefreshURL(context, QUERY_OPTION);
           return results;
         } catch (JSONException e) {
             throw new ParseException("Problem parsing API response", e);

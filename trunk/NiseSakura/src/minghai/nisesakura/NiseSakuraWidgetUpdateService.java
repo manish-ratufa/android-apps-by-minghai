@@ -122,8 +122,8 @@ public class NiseSakuraWidgetUpdateService extends Service {
     mHandler.removeMessages(HTTP_TASK_START);
   }
   
-  private static final String PREFS_NAME = "minghai.nisesakura.NiseSakuraWidget";
-  private static final String EXECUTION_COUNTER_KEY = "execution_counter";
+  protected static final String PREFS_NAME = "minghai.nisesakura.NiseSakuraWidget";
+  private   static final String EXECUTION_COUNTER_KEY = "execution_counter";
   
   // Write the prefix to the SharedPreferences object for this widget
   static void saveExecutionCount(Context context, int executionCount) {
@@ -169,7 +169,7 @@ public class NiseSakuraWidgetUpdateService extends Service {
       try {
         // Try querying the Twitter Search API for today's twit
         SimpleTwitterHelper.prepareUserAgent(args[0]);
-        pageContent = SimpleTwitterHelper.getPageContent();
+        pageContent = SimpleTwitterHelper.getPageContent(NiseSakuraWidgetUpdateService.this);
         Log.d("TEST", "results.length() = " + pageContent.size());
         
         for (String s : pageContent) {
